@@ -1,0 +1,9 @@
+{
+  "modelVersion": "5.0.0",
+  "description": "个人记账本 - HarmonyOS NEXT 课程设计项目",
+  "dependencies": {},
+  "devDependencies": {
+    "@ohos/hvigor-ohos-plugin": "5.0.2",
+    "@ohos/hvigor": "5.0.2"
+  }
+}

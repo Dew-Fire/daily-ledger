@@ -1,0 +1,19 @@
+# HarmonyOS / DevEco Studio
+.idea/
+*.iml
+.gradle/
+build/
+.cxx/
+*.hsp
+.hvigor/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Dependencies
+node_modules/
+oh_modules/
+
+# Local config
+local.properties
