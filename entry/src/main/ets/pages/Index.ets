@@ -1,28 +1,54 @@
 @Entry
 @Component
 struct Index {
-  @State message: string = '个人记账本';
+  @State currentIndex: number = 0;
+  private controller: TabsController = new TabsController();
+
+  @Builder
+  TabBarBuilder(title: string, icon: Resource, index: number) {
+    Column() {
+      Image(icon)
+        .width(24)
+        .height(24)
+        .fillColor(this.currentIndex === index ? '#1296db' : '#999999')
+      Text(title)
+        .fontSize(10)
+        .fontColor(this.currentIndex === index ? '#1296db' : '#999999')
+        .margin({ top: 2 })
+    }
+    .justifyContent(FlexAlign.Center)
+    .height('100%')
+    .width('100%')
+    .onClick(() => {
+      this.currentIndex = index;
+      this.controller.changeIndex(index);
+    })
+  }
 
   build() {
-    Column() {
-      Text(this.message)
-        .fontSize(50)
-        .fontWeight(FontWeight.Bold)
-        .fontColor('#333333')
+    Tabs({
+      barPosition: BarPosition.End,
+      controller: this.controller
+    }) {
+      TabContent() {
+        BillListPage()
+      }
+      .tabBar(this.TabBarBuilder('账单', $r('sys.media.ohos_ic_public_add'), 0))
 
-      Text('每日记账，轻松理财')
-        .fontSize(16)
-        .fontColor('#999999')
-        .margin({ top: 12 })
+      TabContent() {
+        StatisticsPage()
+      }
+      .tabBar(this.TabBarBuilder('统计', $r('sys.media.ohos_ic_public_add'), 1))
 
-      Text('HarmonyOS NEXT')
-        .fontSize(12)
-        .fontColor('#CCCCCC')
-        .margin({ top: 40 })
+      TabContent() {
+        MinePage()
+      }
+      .tabBar(this.TabBarBuilder('我的', $r('sys.media.ohos_ic_public_add'), 2))
     }
-    .width('100%')
-    .height('100%')
-    .justifyContent(FlexAlign.Center)
-    .backgroundColor('#F5F5F5')
+    .barHeight(56)
+    .barBackgroundColor('#FFFFFF')
+    .onChange((index: number) => {
+      this.currentIndex = index;
+    })
   }
 }
