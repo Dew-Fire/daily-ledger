@@ -1,4 +1,5 @@
 import { router } from '@kit.ArkUI';
+import type { BillItem } from '../model/BillModel';
 
 @Component
 export struct BillListPage {
@@ -77,15 +78,4 @@ export struct BillListPage {
     .height('100%')
     .backgroundColor('#F5F5F5')
   }
-}
-
-// 账单数据模型
-export interface BillItem {
-  id: string;
-  amount: number;
-  type: number;       // 0: 支出, 1: 收入
-  categoryId: string;
-  categoryName: string;
-  note: string;
-  date: string;
 }

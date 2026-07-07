@@ -1,27 +1,10 @@
 import { router } from '@kit.ArkUI';
 import { promptAction } from '@kit.ArkUI';
+import { getFlatCategoryList, type CategoryGroup } from '../model/CategoryModel';
+import type { BillItem } from '../model/BillModel';
 
-// 预设分类
-const EXPENSE_CATEGORIES: Array<Category> = [
-  { id: 'food', name: '餐饮', icon: '🍽️' },
-  { id: 'transport', name: '交通', icon: '🚌' },
-  { id: 'shopping', name: '购物', icon: '🛒' },
-  { id: 'entertainment', name: '娱乐', icon: '🎮' },
-  { id: 'housing', name: '居家', icon: '🏠' },
-  { id: 'medical', name: '医疗', icon: '💊' },
-  { id: 'education', name: '教育', icon: '📚' },
-  { id: 'other_expense', name: '其他', icon: '📌' },
-];
-
-const INCOME_CATEGORIES: Array<Category> = [
-  { id: 'salary', name: '工资', icon: '💰' },
-  { id: 'bonus', name: '奖金', icon: '🎁' },
-  { id: 'investment', name: '投资', icon: '📈' },
-  { id: 'parttime', name: '兼职', icon: '💼' },
-  { id: 'other_income', name: '其他', icon: '📌' },
-];
-
-interface Category {
+// 扁平化分类项
+interface FlatCategory {
   id: string;
   name: string;
   icon: string;
@@ -51,8 +34,8 @@ export struct AddBillPage {
     this.selectedDate = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;
   }
 
-  get categories(): Array<Category> {
-    return this.billType === 0 ? EXPENSE_CATEGORIES : INCOME_CATEGORIES;
+  get categories(): Array<FlatCategory> {
+    return getFlatCategoryList(this.billType);
   }
 
   build() {
@@ -141,7 +124,7 @@ export struct AddBillPage {
           .margin({ bottom: 12 })
 
         Grid() {
-          ForEach(this.categories, (item: Category) => {
+          ForEach(this.categories, (item: FlatCategory) => {
             GridItem() {
               Column() {
                 Text(item.icon)
