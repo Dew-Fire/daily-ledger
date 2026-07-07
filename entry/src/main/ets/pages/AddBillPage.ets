@@ -1,7 +1,8 @@
 import { router } from '@kit.ArkUI';
 import { promptAction } from '@kit.ArkUI';
-import { getFlatCategoryList, type CategoryGroup } from '../model/CategoryModel';
+import { getFlatCategoryList } from '../model/CategoryModel';
 import type { BillItem } from '../model/BillModel';
+import { addOrUpdateBill } from './BillListPage';
 
 // 扁平化分类项
 interface FlatCategory {
@@ -20,18 +21,32 @@ export struct AddBillPage {
   @State note: string = '';
   @State selectedDate: string = '';
 
-  // 从路由参数获取编辑数据
-  private isEditMode: boolean = false;
+  // 编辑模式
+  @State isEditMode: boolean = false;
   private editBillId: string = '';
 
   aboutToAppear(): void {
     const params = router.getParams() as Record<string, Object>;
-    if (params && params['billType'] !== undefined) {
-      this.billType = params['billType'] as number;
+    if (params && params['editMode'] === true) {
+      // 编辑模式：预填表单
+      this.isEditMode = true;
+      this.editBillId = params['billId'] as string;
+      this.billType = params['type'] as number;
+      this.amount = String(params['amount'] as number);
+      this.selectedCategoryId = params['categoryId'] as string;
+      this.selectedCategoryName = params['categoryName'] as string;
+      this.note = (params['note'] as string) || '';
+      this.selectedDate = params['date'] as string;
+    } else {
+      // 新建模式：默认值
+      this.isEditMode = false;
+      this.editBillId = '';
+      if (params && params['billType'] !== undefined) {
+        this.billType = params['billType'] as number;
+      }
+      const now = new Date();
+      this.selectedDate = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;
     }
-    // 设置默认日期为今天
-    const now = new Date();
-    this.selectedDate = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;
   }
 
   get categories(): Array<FlatCategory> {
@@ -206,21 +221,24 @@ export struct AddBillPage {
       return;
     }
 
-    // 构造账单数据并通过路由返回
-    const billData: Record<string, Object> = {
-      'amount': amountNum,
-      'type': this.billType,
-      'categoryId': this.selectedCategoryId,
-      'categoryName': this.selectedCategoryName,
-      'note': this.note,
-      'date': this.selectedDate,
+    // 构造账单数据
+    const bill: BillItem = {
+      id: this.editBillId || '',
+      amount: amountNum,
+      type: this.billType,
+      categoryId: this.selectedCategoryId,
+      categoryName: this.selectedCategoryName,
+      note: this.note,
+      date: this.selectedDate,
     };
 
-    if (this.isEditMode) {
-      billData['id'] = this.editBillId;
-    }
+    // 写入模块级共享数据
+    addOrUpdateBill(bill);
 
-    promptAction.showToast({ message: '记录成功', duration: 2000 });
+    promptAction.showToast({
+      message: this.isEditMode ? '修改成功' : '记录成功',
+      duration: 2000
+    });
     router.back();
   }
 }
