@@ -2,6 +2,7 @@
   "src": [
     "pages/Index",
     "pages/BillListPage",
+    "pages/AddBillPage",
     "pages/StatisticsPage",
     "pages/MinePage"
   ]

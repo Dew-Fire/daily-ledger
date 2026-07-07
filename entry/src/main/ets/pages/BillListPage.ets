@@ -1,3 +1,5 @@
+import { router } from '@kit.ArkUI';
+
 @Component
 export struct BillListPage {
   @State bills: Array<BillItem> = [];
@@ -18,7 +20,7 @@ export struct BillListPage {
           .fontSize(28)
           .fontColor('#1296db')
           .onClick(() => {
-            // TODO: 跳转新增账单页
+            router.pushUrl({ url: 'pages/AddBillPage' });
           })
       }
       .width('100%')
