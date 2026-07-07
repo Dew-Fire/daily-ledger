@@ -17,3 +17,6 @@ oh_modules/
 
 # Local config
 local.properties
+
+# Claude AI assistant (local only)
+CLAUDE.md
