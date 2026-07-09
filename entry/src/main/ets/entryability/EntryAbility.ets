@@ -2,11 +2,13 @@ import { UIAbility, Want, AbilityConstant } from '@kit.AbilityKit';
 import { hilog } from '@kit.PerformanceAnalysisKit';
 import { window } from '@kit.ArkUI';
 import { initDatabase } from '../database/DatabaseHelper';
+import { BudgetChecker } from '../utils/BudgetChecker';
+
+const budgetChecker = new BudgetChecker();
 
 export default class EntryAbility extends UIAbility {
   onCreate(want: Want, launchParam: AbilityConstant.LaunchParam): void {
     hilog.info(0x0000, 'DailyLedger', '%{public}s', 'Ability onCreate');
-    // 初始化关系型数据库
     initDatabase(this.context);
   }
 
@@ -32,6 +34,8 @@ export default class EntryAbility extends UIAbility {
 
   onForeground(): void {
     hilog.info(0x0000, 'DailyLedger', '%{public}s', 'Ability onForeground');
+    // 每次回到前台检查预算
+    budgetChecker.checkAndNotify();
   }
 
   onBackground(): void {
