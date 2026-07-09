@@ -2,7 +2,7 @@ import { router } from '@kit.ArkUI';
 import { promptAction } from '@kit.ArkUI';
 import { getFlatCategoryList } from '../model/CategoryModel';
 import type { BillItem } from '../model/BillModel';
-import { addOrUpdateBill } from './BillListPage';
+import { billViewModel } from '../viewmodel/BillViewModel';
 
 // 扁平化分类项
 interface FlatCategory {
@@ -210,7 +210,7 @@ export struct AddBillPage {
     .backgroundColor('#F5F5F5')
   }
 
-  saveBill(): void {
+  async saveBill(): Promise<void> {
     const amountNum = parseFloat(this.amount);
     if (isNaN(amountNum) || amountNum <= 0) {
       promptAction.showToast({ message: '请输入有效金额', duration: 2000 });
@@ -232,13 +232,20 @@ export struct AddBillPage {
       date: this.selectedDate,
     };
 
-    // 写入模块级共享数据
-    addOrUpdateBill(bill);
+    try {
+      if (this.isEditMode) {
+        await billViewModel.updateBill(bill);
+      } else {
+        await billViewModel.addBill(bill);
+      }
 
-    promptAction.showToast({
-      message: this.isEditMode ? '修改成功' : '记录成功',
-      duration: 2000
-    });
-    router.back();
+      promptAction.showToast({
+        message: this.isEditMode ? '修改成功' : '记录成功',
+        duration: 2000
+      });
+      router.back();
+    } catch (e) {
+      promptAction.showToast({ message: '保存失败，请重试', duration: 2000 });
+    }
   }
 }

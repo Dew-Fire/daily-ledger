@@ -1,6 +1,7 @@
 import { router } from '@kit.ArkUI';
 import { promptAction } from '@kit.ArkUI';
 import type { BillItem } from '../model/BillModel';
+import { billViewModel } from '../viewmodel/BillViewModel';
 
 // 按日期分组的账单组
 class BillGroup {
@@ -10,17 +11,6 @@ class BillGroup {
   totalExpense: number = 0;
   totalIncome: number = 0;
 }
-
-// Mock 数据存储（模块级，模拟数据源）
-let allBills: Array<BillItem> = [
-  { id: '1', amount: 25.5, type: 0, categoryId: 'food_lunch', categoryName: '餐饮·午餐', note: '外卖黄焖鸡', date: '2026-07-07' },
-  { id: '2', amount: 4, type: 0, categoryId: 'transport_bus', categoryName: '交通·公交', note: '', date: '2026-07-07' },
-  { id: '3', amount: 49.9, type: 0, categoryId: 'shopping_daily', categoryName: '购物·日用品', note: '超市采购', date: '2026-07-07' },
-  { id: '4', amount: 10000, type: 1, categoryId: 'salary_base', categoryName: '工资·基本工资', note: '7月工资', date: '2026-07-06' },
-  { id: '5', amount: 88, type: 0, categoryId: 'entertainment_movie', categoryName: '娱乐·电影', note: '周末电影', date: '2026-07-06' },
-  { id: '6', amount: 15, type: 0, categoryId: 'food_snack', categoryName: '餐饮·零食', note: '便利店', date: '2026-07-01' },
-];
-let nextId = 7;
 
 // 将账单按日期分组
 function groupBillsByDate(bills: Array<BillItem>): Array<BillGroup> {
@@ -67,38 +57,47 @@ export struct BillListPage {
   @State monthExpense: number = 0;
   @State isEmpty: boolean = true;
   @State showDeleteDialog: boolean = false;
+  @State isLoading: boolean = true;
   private deleteTargetId: string = '';
+  private allBills: Array<BillItem> = [];
 
   aboutToAppear(): void {
     this.refreshList();
   }
 
-  // 每次页面显示时刷新
   onPageShow(): void {
     this.refreshList();
   }
 
-  refreshList(): void {
-    if (allBills.length > 0) {
-      this.billGroups = groupBillsByDate(allBills);
-      this.isEmpty = false;
+  async refreshList(): Promise<void> {
+    try {
+      this.isLoading = true;
+      this.allBills = await billViewModel.loadBills();
 
-      let income = 0;
-      let expense = 0;
-      allBills.forEach((b) => {
-        if (b.type === 1) income += b.amount;
-        else expense += b.amount;
-      });
-      this.monthIncome = income;
-      this.monthExpense = expense;
-    } else {
-      this.isEmpty = true;
-      this.monthIncome = 0;
-      this.monthExpense = 0;
+      if (this.allBills.length > 0) {
+        this.billGroups = groupBillsByDate(this.allBills);
+        this.isEmpty = false;
+
+        let income = 0;
+        let expense = 0;
+        this.allBills.forEach((b) => {
+          if (b.type === 1) income += b.amount;
+          else expense += b.amount;
+        });
+        this.monthIncome = income;
+        this.monthExpense = expense;
+      } else {
+        this.isEmpty = true;
+        this.monthIncome = 0;
+        this.monthExpense = 0;
+      }
+    } catch (e) {
+      console.error('Failed to load bills:', JSON.stringify(e));
+    } finally {
+      this.isLoading = false;
     }
   }
 
-  // 点击账单 → 编辑
   editBill(bill: BillItem): void {
     router.pushUrl({
       url: 'pages/AddBillPage',
@@ -115,18 +114,20 @@ export struct BillListPage {
     });
   }
 
-  // 滑动 → 确认删除
   confirmDelete(billId: string): void {
     this.deleteTargetId = billId;
     this.showDeleteDialog = true;
   }
 
-  // 执行删除
-  doDelete(): void {
-    allBills = allBills.filter((b) => b.id !== this.deleteTargetId);
-    this.refreshList();
-    this.showDeleteDialog = false;
-    promptAction.showToast({ message: '已删除', duration: 2000 });
+  async doDelete(): Promise<void> {
+    try {
+      await billViewModel.deleteBill(this.deleteTargetId);
+      this.showDeleteDialog = false;
+      promptAction.showToast({ message: '已删除', duration: 2000 });
+      await this.refreshList();
+    } catch (e) {
+      console.error('Failed to delete bill:', JSON.stringify(e));
+    }
   }
 
   cancelDelete(): void {
@@ -188,7 +189,21 @@ export struct BillListPage {
         .borderRadius(12)
         .margin({ left: 16, right: 16, top: 8 })
 
-        if (this.isEmpty) {
+        if (this.isLoading) {
+          Column() {
+            LoadingProgress()
+              .width(36)
+              .height(36)
+              .color('#1296db')
+            Text('加载中...')
+              .fontSize(14)
+              .fontColor('#CCCCCC')
+              .margin({ top: 12 })
+          }
+          .width('100%')
+          .layoutWeight(1)
+          .justifyContent(FlexAlign.Center)
+        } else if (this.isEmpty) {
           Column() {
             Text('还没有账单记录')
               .fontSize(16)
@@ -358,16 +373,5 @@ export struct BillListPage {
     .backgroundColor('#FFFFFF')
     .borderRadius(10)
     .margin({ bottom: 8 })
-  }
-}
-
-// 导出函数供 AddBillPage 调用，新增/更新账单
-export function addOrUpdateBill(bill: BillItem): void {
-  const index = allBills.findIndex((b) => b.id === bill.id);
-  if (index >= 0) {
-    allBills[index] = bill;
-  } else {
-    const newBill: BillItem = { ...bill, id: String(nextId++) };
-    allBills = [newBill, ...allBills];
   }
 }
