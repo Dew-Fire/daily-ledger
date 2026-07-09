@@ -1,11 +1,14 @@
 import { BillListPage } from './BillListPage';
 import { StatisticsPage } from './StatisticsPage';
 import { MinePage } from './MinePage';
+import { breakpointSystem, BreakpointType } from '../utils/BreakpointSystem';
 
 @Entry
 @Component
 struct Index {
   @State currentIndex: number = 0;
+  @State contentType: string = 'phone';
+  @StorageLink('currentBreakpoint') currentBreakpoint: BreakpointType = BreakpointType.SM;
   private controller: TabsController = new TabsController();
 
   @Builder
@@ -51,6 +54,8 @@ struct Index {
     }
     .barHeight(56)
     .barBackgroundColor('#FFFFFF')
+    .barMode(breakpointSystem.isTablet() ? BarMode.Fixed : BarMode.Free)
+    .width(breakpointSystem.isTablet() ? '600vp' : '100%')
     .onChange((index: number) => {
       this.currentIndex = index;
     })
