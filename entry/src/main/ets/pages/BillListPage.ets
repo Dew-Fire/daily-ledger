@@ -50,6 +50,7 @@ function groupBillsByDate(bills: Array<BillItem>): Array<BillGroup> {
   return Array.from(groupMap.values()).sort((a, b) => b.date.localeCompare(a.date));
 }
 
+@Entry
 @Component
 export struct BillListPage {
   @State billGroups: Array<BillGroup> = [];
@@ -99,18 +100,19 @@ export struct BillListPage {
   }
 
   editBill(bill: BillItem): void {
+    const params: Record<string, Object> = {
+      'editMode': true,
+      'billId': bill.id,
+      'amount': bill.amount,
+      'type': bill.type,
+      'categoryId': bill.categoryId,
+      'categoryName': bill.categoryName,
+      'note': bill.note,
+      'date': bill.date,
+    };
     router.pushUrl({
       url: 'pages/AddBillPage',
-      params: {
-        editMode: true,
-        billId: bill.id,
-        amount: bill.amount,
-        type: bill.type,
-        categoryId: bill.categoryId,
-        categoryName: bill.categoryName,
-        note: bill.note,
-        date: bill.date,
-      } as Record<string, Object>
+      params: params,
     });
   }
 

@@ -1,5 +1,6 @@
 import { router } from '@kit.ArkUI';
 
+@Entry
 @Component
 export struct MinePage {
   build() {

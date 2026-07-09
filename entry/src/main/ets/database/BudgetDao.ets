@@ -1,6 +1,13 @@
 import { relationalStore } from '@kit.ArkData';
 import { getRdbStore } from './DatabaseHelper';
 
+// 预算状态结果
+interface BudgetStatusResult {
+  budget: number;
+  expense: number;
+  percent: number;
+}
+
 /**
  * 预算数据访问对象
  */
@@ -9,9 +16,6 @@ export class BudgetDao {
     return getRdbStore();
   }
 
-  /**
-   * 设置月度预算（插入或更新）
-   */
   async setBudget(month: string, amount: number): Promise<void> {
     const store = this.getStore();
     const existing = await this.getBudget(month);
@@ -22,18 +26,16 @@ export class BudgetDao {
       predicates.equalTo('month', month);
       await store.update(valueBucket, predicates);
     } else {
+      const now = Date.now();
       const valueBucket: relationalStore.ValuesBucket = {
         month,
         amount,
-        created_at: Date.now(),
+        created_at: now,
       };
       await store.insert('budgets', valueBucket);
     }
   }
 
-  /**
-   * 获取月度预算
-   */
   async getBudget(month: string): Promise<number | null> {
     const store = this.getStore();
     const predicates = new relationalStore.RdbPredicates('budgets');
@@ -50,23 +52,29 @@ export class BudgetDao {
   }
 
   /**
-   * 获取当月预算使用情况
+   * 获取当月预算使用情况（通过直接查询账单表计算支出）
    */
-  async getBudgetStatus(month: string): Promise<{ budget: number; expense: number; percent: number }> {
+  async getBudgetStatus(month: string): Promise<BudgetStatusResult> {
     const budget = await this.getBudget(month);
     if (budget === null || budget <= 0) {
-      return { budget: 0, expense: 0, percent: 0 };
+      const empty: BudgetStatusResult = { budget: 0, expense: 0, percent: 0 };
+      return empty;
     }
 
-    // 获取当月支出
-    const BillDao = (await import('./BillDao')).BillDao;
-    const billDao = new BillDao();
-    const summary = await billDao.getMonthSummary(month);
+    // 直接查询当月支出
+    const store = this.getStore();
+    const predicates = new relationalStore.RdbPredicates('bills');
+    predicates.like('date', `${month}%`).equalTo('type', 0);
+    const resultSet = await store.query(predicates);
 
-    return {
-      budget: budget,
-      expense: summary.expense,
-      percent: (summary.expense / budget) * 100,
-    };
+    let expense = 0;
+    while (resultSet.goToNextRow()) {
+      expense += resultSet.getDouble(resultSet.getColumnIndex('amount'));
+    }
+    resultSet.close();
+
+    const percent = (expense / budget) * 100;
+    const status: BudgetStatusResult = { budget, expense, percent };
+    return status;
   }
 }

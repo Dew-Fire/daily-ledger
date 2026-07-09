@@ -110,7 +110,7 @@ export class BillDao {
   /**
    * 按月汇总收支
    */
-  async getMonthSummary(month: string): Promise<{ income: number; expense: number }> {
+  async getMonthSummary(month: string): Promise<MonthSummaryResult> {
     const bills = await this.queryByMonth(month);
     let income = 0;
     let expense = 0;
@@ -118,6 +118,12 @@ export class BillDao {
       if (b.type === 1) income += b.amount;
       else expense += b.amount;
     });
-    return { income, expense };
+    const result: MonthSummaryResult = { income, expense };
+    return result;
   }
+}
+
+interface MonthSummaryResult {
+  income: number;
+  expense: number;
 }

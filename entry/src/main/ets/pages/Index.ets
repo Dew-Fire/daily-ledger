@@ -1,3 +1,7 @@
+import { BillListPage } from './BillListPage';
+import { StatisticsPage } from './StatisticsPage';
+import { MinePage } from './MinePage';
+
 @Entry
 @Component
 struct Index {

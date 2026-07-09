@@ -139,15 +139,27 @@ export function getCategoriesByType(type: number): Array<CategoryGroup> {
   return type === 0 ? EXPENSE_CATEGORIES : INCOME_CATEGORIES;
 }
 
+// 扁平分类项
+export interface FlatCategoryItem {
+  id: string;
+  name: string;
+  icon: string;
+}
+
 /**
- * 获取所有一级分类（扁平化用于快速展示）
+ * 获取所有二级分类（扁平化用于快速展示）
  */
-export function getFlatCategoryList(type: number): Array<{ id: string; name: string; icon: string }> {
+export function getFlatCategoryList(type: number): Array<FlatCategoryItem> {
   const groups = getCategoriesByType(type);
-  const result: Array<{ id: string; name: string; icon: string }> = [];
-  groups.forEach((group) => {
-    group.children.forEach((child) => {
-      result.push({ id: child.id, name: `${group.name}·${child.name}`, icon: child.icon });
+  const result: Array<FlatCategoryItem> = [];
+  groups.forEach((group: CategoryGroup) => {
+    group.children.forEach((child: SubCategory) => {
+      const item: FlatCategoryItem = {
+        id: child.id,
+        name: `${group.name}·${child.name}`,
+        icon: child.icon
+      };
+      result.push(item);
     });
   });
   return result;

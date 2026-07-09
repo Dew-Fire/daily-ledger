@@ -1,6 +1,6 @@
-import { billViewModel } from '../viewmodel/BillViewModel';
+import { billViewModel, type CategoryStatItem } from '../viewmodel/BillViewModel';
 
-// 分类统计项
+// 分类统计展示项
 interface CategoryStat {
   name: string;
   amount: number;
@@ -21,6 +21,7 @@ const COLORS: Array<string> = [
   '#8BC34A', '#FF4081', '#536DFE', '#FF6E40', '#64B5F6',
 ];
 
+@Entry
 @Component
 export struct StatisticsPage {
   @State currentMonth: string = '';
@@ -48,23 +49,29 @@ export struct StatisticsPage {
       const expenseItems = stats.filter((s) => s.type === 0);
       const totalExpense = expenseItems.reduce((sum, s) => sum + s.amount, 0);
       this.monthExpense = totalExpense;
-      this.expenseStats = expenseItems.map((s, i) => ({
-        name: s.name,
-        amount: s.amount,
-        percent: totalExpense > 0 ? (s.amount / totalExpense) * 100 : 0,
-        color: COLORS[i % COLORS.length],
-      }));
+      this.expenseStats = expenseItems.map((s: CategoryStatItem, i: number) => {
+        const stat: CategoryStat = {
+          name: s.name,
+          amount: s.amount,
+          percent: totalExpense > 0 ? (s.amount / totalExpense) * 100 : 0,
+          color: COLORS[i % COLORS.length],
+        };
+        return stat;
+      });
 
       // 收入分类
       const incomeItems = stats.filter((s) => s.type === 1);
       const totalIncome = incomeItems.reduce((sum, s) => sum + s.amount, 0);
       this.monthIncome = totalIncome;
-      this.incomeStats = incomeItems.map((s, i) => ({
-        name: s.name,
-        amount: s.amount,
-        percent: totalIncome > 0 ? (s.amount / totalIncome) * 100 : 0,
-        color: COLORS[i % COLORS.length],
-      }));
+      this.incomeStats = incomeItems.map((s: CategoryStatItem, i: number) => {
+        const stat: CategoryStat = {
+          name: s.name,
+          amount: s.amount,
+          percent: totalIncome > 0 ? (s.amount / totalIncome) * 100 : 0,
+          color: COLORS[i % COLORS.length],
+        };
+        return stat;
+      });
 
       // 加载月度趋势
       this.monthlyTrend = await billViewModel.getMonthlyTrend(6);

@@ -1,15 +1,8 @@
 import { router } from '@kit.ArkUI';
 import { promptAction } from '@kit.ArkUI';
-import { getFlatCategoryList } from '../model/CategoryModel';
+import { getFlatCategoryList, type FlatCategoryItem } from '../model/CategoryModel';
 import type { BillItem } from '../model/BillModel';
 import { billViewModel } from '../viewmodel/BillViewModel';
-
-// 扁平化分类项
-interface FlatCategory {
-  id: string;
-  name: string;
-  icon: string;
-}
 
 @Entry
 @Component
@@ -49,7 +42,7 @@ export struct AddBillPage {
     }
   }
 
-  get categories(): Array<FlatCategory> {
+  get categories(): Array<FlatCategoryItem> {
     return getFlatCategoryList(this.billType);
   }
 
@@ -139,7 +132,7 @@ export struct AddBillPage {
           .margin({ bottom: 12 })
 
         Grid() {
-          ForEach(this.categories, (item: FlatCategory) => {
+          ForEach(this.categories, (item: FlatCategoryItem) => {
             GridItem() {
               Column() {
                 Text(item.icon)
