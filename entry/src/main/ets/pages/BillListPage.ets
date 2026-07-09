@@ -149,6 +149,13 @@ export struct BillListPage {
 
           Blank()
 
+          Text('🔍')
+            .fontSize(22)
+            .margin({ right: 16 })
+            .onClick(() => {
+              router.pushUrl({ url: 'pages/SearchPage' });
+            })
+
           Text('+')
             .fontSize(28)
             .fontColor('#1296db')

@@ -6,6 +6,7 @@
     "pages/StatisticsPage",
     "pages/MinePage",
     "pages/CategoryPage",
-    "pages/BudgetPage"
+    "pages/BudgetPage",
+    "pages/SearchPage"
   ]
 }
