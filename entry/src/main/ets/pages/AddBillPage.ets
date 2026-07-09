@@ -237,6 +237,10 @@ export struct AddBillPage {
         message: this.isEditMode ? '修改成功' : '记录成功',
         duration: 2000
       });
+
+      // 触发账单列表刷新
+      AppStorage.setOrCreate('billRefreshKey', Date.now());
+
       router.back();
     } catch (e) {
       promptAction.showToast({ message: '保存失败，请重试', duration: 2000 });

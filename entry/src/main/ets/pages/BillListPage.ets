@@ -59,6 +59,7 @@ export struct BillListPage {
   @State isEmpty: boolean = true;
   @State showDeleteDialog: boolean = false;
   @State isLoading: boolean = true;
+  @StorageLink('billRefreshKey') @Watch('onRefreshKeyChange') refreshKey: number = 0;
   private deleteTargetId: string = '';
   private allBills: Array<BillItem> = [];
 
@@ -66,7 +67,7 @@ export struct BillListPage {
     this.refreshList();
   }
 
-  onPageShow(): void {
+  onRefreshKeyChange(): void {
     this.refreshList();
   }
 
