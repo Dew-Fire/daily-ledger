@@ -51,13 +51,8 @@ export default class MyFormAbility extends FormExtensionAbility {
         'budgetStatus': `本月收支 | ${month}`,
       };
 
-      // 更新卡片
-      const bindingData = formBindingData.createFormBindingData(formData);
-      const formId = want['ohos.extra.param.key.form_identity'] as string;
-      if (formId) {
-        const FormFormInfo = formBindingData.FormBindingData;
-        // 通过 formBindingData 更新
-      }
+      // 更新卡片数据
+      formBindingData.createFormBindingData(formData);
     } catch (e) {
       hilog.error(0x0000, 'MyFormAbility', 'Failed to load widget data');
     }

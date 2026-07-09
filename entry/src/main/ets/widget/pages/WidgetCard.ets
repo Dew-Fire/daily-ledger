@@ -1,24 +1,23 @@
 /**
  * 桌面服务卡片 — 当月收支概况 + 快速记账入口
+ * 注意：服务卡片仅支持部分 ArkTS 组件，需避免状态装饰器
  */
 @Entry
 @Component
 struct WidgetCard {
-  @LocalStorageProp('monthIncome') monthIncome: string = '¥ 0.00';
-  @LocalStorageProp('monthExpense') monthExpense: string = '¥ 0.00';
-  @LocalStorageProp('budgetStatus') budgetStatus: string = '加载中...';
-  @LocalStorageLink('detail') detail: string = '{}';
+  // 服务卡片数据通过 formBindingData 注入，使用普通属性
+  readonly monthIncome: string = '¥ 0.00';
+  readonly monthExpense: string = '¥ 0.00';
+  readonly budgetStatus: string = '加载中...';
 
   build() {
     Stack() {
       Column() {
-        // 标题
         Text('个人记账本')
           .fontSize(16)
           .fontWeight(FontWeight.Bold)
           .fontColor('#FFFFFF')
 
-        // 当月收支
         Row() {
           Column() {
             Text('收入')
@@ -47,7 +46,6 @@ struct WidgetCard {
         .width('100%')
         .margin({ top: 12 })
 
-        // 提示
         Text(this.budgetStatus)
           .fontSize(11)
           .fontColor('#B0BEC5')
@@ -59,7 +57,7 @@ struct WidgetCard {
     }
     .width('100%')
     .height('100%')
-    .backgroundColor('linear-gradient(135deg, #1a73e8 0%, #0d47a1 100%)')
+    .backgroundColor('#1a73e8')
     .borderRadius(16)
   }
 }
