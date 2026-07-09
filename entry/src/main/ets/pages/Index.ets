@@ -10,12 +10,10 @@ struct Index {
   private controller: TabsController = new TabsController();
 
   @Builder
-  TabBarBuilder(title: string, icon: Resource, index: number) {
+  TabBarBuilder(title: string, icon: string, index: number) {
     Column() {
-      Image(icon)
-        .width(24)
-        .height(24)
-        .fillColor(this.currentIndex === index ? '#1296db' : '#999999')
+      Text(icon)
+        .fontSize(22)
       Text(title)
         .fontSize(10)
         .fontColor(this.currentIndex === index ? '#1296db' : '#999999')
@@ -38,17 +36,17 @@ struct Index {
       TabContent() {
         BillListPage()
       }
-      .tabBar(this.TabBarBuilder('账单', $r('sys.media.ohos_ic_public_add'), 0))
+      .tabBar(this.TabBarBuilder('账单', '📋', 0))
 
       TabContent() {
         StatisticsPage()
       }
-      .tabBar(this.TabBarBuilder('统计', $r('sys.media.ohos_ic_public_add'), 1))
+      .tabBar(this.TabBarBuilder('统计', '📊', 1))
 
       TabContent() {
         MinePage()
       }
-      .tabBar(this.TabBarBuilder('我的', $r('sys.media.ohos_ic_public_add'), 2))
+      .tabBar(this.TabBarBuilder('我的', '👤', 2))
     }
     .barHeight(56)
     .barBackgroundColor('#FFFFFF')
