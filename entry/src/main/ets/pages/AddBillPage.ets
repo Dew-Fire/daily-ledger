@@ -13,15 +13,16 @@ export struct AddBillPage {
   @State selectedCategoryName: string = '';
   @State note: string = '';
   @State selectedDate: string = '';
+  @State categoryList: Array<FlatCategoryItem> = [];
 
   // 编辑模式
   @State isEditMode: boolean = false;
   private editBillId: string = '';
 
   aboutToAppear(): void {
+    this.updateCategories();
     const params = router.getParams() as Record<string, Object>;
     if (params && params['editMode'] === true) {
-      // 编辑模式：预填表单
       this.isEditMode = true;
       this.editBillId = params['billId'] as string;
       this.billType = params['type'] as number;
@@ -31,7 +32,6 @@ export struct AddBillPage {
       this.note = (params['note'] as string) || '';
       this.selectedDate = params['date'] as string;
     } else {
-      // 新建模式：默认值
       this.isEditMode = false;
       this.editBillId = '';
       if (params && params['billType'] !== undefined) {
@@ -40,10 +40,11 @@ export struct AddBillPage {
       const now = new Date();
       this.selectedDate = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;
     }
+    this.updateCategories();
   }
 
-  get categories(): Array<FlatCategoryItem> {
-    return getFlatCategoryList(this.billType);
+  updateCategories(): void {
+    this.categoryList = getFlatCategoryList(this.billType);
   }
 
   build() {
@@ -80,14 +81,14 @@ export struct AddBillPage {
           .type(this.billType === 0 ? ButtonType.Normal : ButtonType.Capsule)
           .backgroundColor(this.billType === 0 ? '#FF5722' : '#F0F0F0')
           .fontColor(this.billType === 0 ? '#FFFFFF' : '#999999')
-          .onClick(() => { this.billType = 0; })
+          .onClick(() => { this.billType = 0; this.updateCategories(); })
 
         Button('收入')
           .type(this.billType === 1 ? ButtonType.Normal : ButtonType.Capsule)
           .backgroundColor(this.billType === 1 ? '#4CAF50' : '#F0F0F0')
           .fontColor(this.billType === 1 ? '#FFFFFF' : '#999999')
           .margin({ left: 12 })
-          .onClick(() => { this.billType = 1; })
+          .onClick(() => { this.billType = 1; this.updateCategories(); })
       }
       .width('100%')
       .padding(16)
@@ -132,7 +133,7 @@ export struct AddBillPage {
           .margin({ bottom: 12 })
 
         Grid() {
-          ForEach(this.categories, (item: FlatCategoryItem) => {
+          ForEach(this.categoryList, (item: FlatCategoryItem) => {
             GridItem() {
               Column() {
                 Text(item.icon)
