@@ -1,7 +1,6 @@
 import { BillListPage } from './BillListPage';
 import { StatisticsPage } from './StatisticsPage';
 import { MinePage } from './MinePage';
-import { breakpointSystem } from '../utils/BreakpointSystem';
 
 @Entry
 @Component
@@ -50,8 +49,7 @@ struct Index {
     }
     .barHeight(56)
     .barBackgroundColor('#FFFFFF')
-    .barMode(breakpointSystem.isTablet() ? BarMode.Fixed : BarMode.Scrollable)
-    .width(breakpointSystem.isTablet() ? '600vp' : '100%')
+    .width('100%')
     .onChange((index: number) => {
       this.currentIndex = index;
     })

@@ -262,18 +262,17 @@ export struct CategoryPage {
               ForEach(ICON_OPTIONS, (icon: string) => {
                 GridItem() {
                   Text(icon)
-                    .fontSize(24)
-                    .width('100%')
+                    .fontSize(22)
                     .textAlign(TextAlign.Center)
-                    .padding(8)
-                    .borderRadius(6)
-                    .backgroundColor(this.editCatIcon === icon ? '#E3F2FD' : '#F5F5F5')
-                    .border({
-                      width: this.editCatIcon === icon ? 1.5 : 0,
-                      color: '#1296db'
-                    })
-                    .onClick(() => { this.editCatIcon = icon; })
                 }
+                .padding(6)
+                .borderRadius(6)
+                .backgroundColor(this.editCatIcon === icon ? '#E3F2FD' : '#F5F5F5')
+                .border({
+                  width: this.editCatIcon === icon ? 1.5 : 0,
+                  color: '#1296db'
+                })
+                .onClick(() => { this.editCatIcon = icon; })
               })
             }
             .columnsTemplate('1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr')
