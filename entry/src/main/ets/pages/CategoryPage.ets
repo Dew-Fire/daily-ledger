@@ -17,6 +17,7 @@ const ICON_OPTIONS: Array<string> = [
 export struct CategoryPage {
   @State currentTab: number = 0;
   @State categories: Array<FlatCategory> = [];
+  @State refreshTrigger: number = 0;
   @State showAddDialog: boolean = false;
   @State editCatName: string = '';
   @State editCatIcon: string = '📌';
@@ -28,7 +29,9 @@ export struct CategoryPage {
   }
 
   async loadCategories(): Promise<void> {
-    this.categories = await categoryViewModel.getAllCategories(this.currentTab);
+    const data = await categoryViewModel.getAllCategories(this.currentTab);
+    this.categories = data;
+    this.refreshTrigger++;
   }
 
   onTabChange(index: number): void {
@@ -180,7 +183,7 @@ export struct CategoryPage {
               .width('100%')
               .padding({ left: 16, right: 16, top: 12, bottom: 12 })
             }
-          }, (cat: FlatCategory) => cat.id)
+          }, (cat: FlatCategory) => `${cat.id}_${cat.icon}_${this.refreshTrigger}`)
         }
         .width('100%')
         .layoutWeight(1)
