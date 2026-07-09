@@ -75,129 +75,137 @@ export struct AddBillPage {
       .width('100%')
       .padding({ left: 16, right: 16, top: 12, bottom: 12 })
 
-      // 收支类型切换
-      Row() {
-        Button('支出')
-          .type(this.billType === 0 ? ButtonType.Normal : ButtonType.Capsule)
-          .backgroundColor(this.billType === 0 ? '#FF5722' : '#F0F0F0')
-          .fontColor(this.billType === 0 ? '#FFFFFF' : '#999999')
-          .onClick(() => { this.billType = 0; this.updateCategories(); })
+      Scroll() {
+        Column() {
+          // 收支类型切换
+          Row() {
+            Button('支出')
+              .type(this.billType === 0 ? ButtonType.Normal : ButtonType.Capsule)
+              .backgroundColor(this.billType === 0 ? '#FF5722' : '#F0F0F0')
+              .fontColor(this.billType === 0 ? '#FFFFFF' : '#999999')
+              .onClick(() => { this.billType = 0; this.updateCategories(); })
 
-        Button('收入')
-          .type(this.billType === 1 ? ButtonType.Normal : ButtonType.Capsule)
-          .backgroundColor(this.billType === 1 ? '#4CAF50' : '#F0F0F0')
-          .fontColor(this.billType === 1 ? '#FFFFFF' : '#999999')
-          .margin({ left: 12 })
-          .onClick(() => { this.billType = 1; this.updateCategories(); })
-      }
-      .width('100%')
-      .padding(16)
-      .justifyContent(FlexAlign.Center)
+            Button('收入')
+              .type(this.billType === 1 ? ButtonType.Normal : ButtonType.Capsule)
+              .backgroundColor(this.billType === 1 ? '#4CAF50' : '#F0F0F0')
+              .fontColor(this.billType === 1 ? '#FFFFFF' : '#999999')
+              .margin({ left: 12 })
+              .onClick(() => { this.billType = 1; this.updateCategories(); })
+          }
+          .width('100%')
+          .padding(16)
+          .justifyContent(FlexAlign.Center)
 
-      // 金额输入
-      Column() {
-        Text('金额')
-          .fontSize(14)
-          .fontColor('#999999')
-          .margin({ bottom: 8 })
+          // 金额输入
+          Column() {
+            Text('金额')
+              .fontSize(14)
+              .fontColor('#999999')
+              .margin({ bottom: 8 })
 
-        Row() {
-          Text('¥')
-            .fontSize(24)
-            .fontColor('#333333')
-            .margin({ right: 4 })
-          TextInput({ text: this.amount, placeholder: '0.00' })
-            .fontSize(32)
-            .fontWeight(FontWeight.Bold)
-            .type(InputType.Number)
+            Row() {
+              Text('¥')
+                .fontSize(24)
+                .fontColor('#333333')
+                .margin({ right: 4 })
+              TextInput({ text: this.amount, placeholder: '0.00' })
+                .fontSize(32)
+                .fontWeight(FontWeight.Bold)
+                .type(InputType.Number)
+                .width('100%')
+                .backgroundColor(Color.Transparent)
+                .onChange((value: string) => {
+                  this.amount = value;
+                })
+            }
             .width('100%')
-            .backgroundColor(Color.Transparent)
+            .alignItems(VerticalAlign.Center)
+          }
+          .width('100%')
+          .padding(16)
+          .backgroundColor('#FFFFFF')
+          .borderRadius(12)
+          .margin({ left: 16, right: 16, top: 8 })
+
+          // 分类选择
+          Column() {
+            Text('选择分类')
+              .fontSize(14)
+              .fontColor('#999999')
+              .margin({ bottom: 12 })
+
+            Grid() {
+              ForEach(this.categoryList, (item: FlatCategoryItem) => {
+                GridItem() {
+                  Column() {
+                    Text(item.icon)
+                      .fontSize(28)
+                    Text(item.name)
+                      .fontSize(12)
+                      .fontColor(this.selectedCategoryId === item.id ? '#1296db' : '#666666')
+                      .margin({ top: 4 })
+                  }
+                  .width('100%')
+                  .padding({ top: 12, bottom: 12 })
+                  .borderRadius(8)
+                  .backgroundColor(this.selectedCategoryId === item.id ? '#E3F2FD' : '#F5F5F5')
+                  .border({
+                    width: this.selectedCategoryId === item.id ? 1.5 : 0,
+                    color: '#1296db'
+                  })
+                  .onClick(() => {
+                    this.selectedCategoryId = item.id;
+                    this.selectedCategoryName = item.name;
+                  })
+                }
+              })
+            }
+            .columnsTemplate('1fr 1fr 1fr 1fr')
+            .rowsGap(8)
+            .columnsGap(8)
+            .width('100%')
+          }
+          .width('100%')
+          .padding(16)
+          .backgroundColor('#FFFFFF')
+          .borderRadius(12)
+          .margin({ left: 16, right: 16, top: 8 })
+
+          // 日期选择
+          Row() {
+            Text('日期')
+              .fontSize(15)
+              .fontColor('#333333')
+
+            Blank()
+
+            Text(this.selectedDate)
+              .fontSize(15)
+              .fontColor('#1296db')
+          }
+          .width('100%')
+          .padding(16)
+          .backgroundColor('#FFFFFF')
+          .borderRadius(12)
+          .margin({ left: 16, right: 16, top: 8 })
+
+          // 备注输入
+          TextInput({ text: this.note, placeholder: '添加备注...' })
+            .fontSize(15)
+            .width('100%')
+            .padding(16)
+            .backgroundColor('#FFFFFF')
+            .borderRadius(12)
+            .margin({ left: 16, right: 16, top: 8, bottom: 24 })
             .onChange((value: string) => {
-              this.amount = value;
+              this.note = value;
             })
         }
         .width('100%')
-        .alignItems(VerticalAlign.Center)
       }
-      .width('100%')
-      .padding(16)
-      .backgroundColor('#FFFFFF')
-      .borderRadius(12)
-      .margin({ left: 16, right: 16, top: 8 })
-
-      // 分类选择
-      Column() {
-        Text('选择分类')
-          .fontSize(14)
-          .fontColor('#999999')
-          .margin({ bottom: 12 })
-
-        Grid() {
-          ForEach(this.categoryList, (item: FlatCategoryItem) => {
-            GridItem() {
-              Column() {
-                Text(item.icon)
-                  .fontSize(28)
-                Text(item.name)
-                  .fontSize(12)
-                  .fontColor(this.selectedCategoryId === item.id ? '#1296db' : '#666666')
-                  .margin({ top: 4 })
-              }
-              .width('100%')
-              .padding({ top: 12, bottom: 12 })
-              .borderRadius(8)
-              .backgroundColor(this.selectedCategoryId === item.id ? '#E3F2FD' : '#F5F5F5')
-              .border({
-                width: this.selectedCategoryId === item.id ? 1.5 : 0,
-                color: '#1296db'
-              })
-              .onClick(() => {
-                this.selectedCategoryId = item.id;
-                this.selectedCategoryName = item.name;
-              })
-            }
-          })
-        }
-        .columnsTemplate('1fr 1fr 1fr 1fr')
-        .rowsGap(8)
-        .columnsGap(8)
-        .width('100%')
-      }
-      .width('100%')
-      .padding(16)
-      .backgroundColor('#FFFFFF')
-      .borderRadius(12)
-      .margin({ left: 16, right: 16, top: 8 })
-
-      // 日期选择
-      Row() {
-        Text('日期')
-          .fontSize(15)
-          .fontColor('#333333')
-
-        Blank()
-
-        Text(this.selectedDate)
-          .fontSize(15)
-          .fontColor('#1296db')
-      }
-      .width('100%')
-      .padding(16)
-      .backgroundColor('#FFFFFF')
-      .borderRadius(12)
-      .margin({ left: 16, right: 16, top: 8 })
-
-      // 备注输入
-      TextInput({ text: this.note, placeholder: '添加备注...' })
-        .fontSize(15)
-        .width('100%')
-        .padding(16)
-        .backgroundColor('#FFFFFF')
-        .borderRadius(12)
-        .margin({ left: 16, right: 16, top: 8 })
-        .onChange((value: string) => {
-          this.note = value;
-        })
+      .layoutWeight(1)
+      .scrollable(ScrollDirection.Vertical)
+      .scrollBar(BarState.Auto)
     }
     .width('100%')
     .height('100%')
