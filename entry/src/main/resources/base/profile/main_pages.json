@@ -4,6 +4,7 @@
     "pages/BillListPage",
     "pages/AddBillPage",
     "pages/StatisticsPage",
-    "pages/MinePage"
+    "pages/MinePage",
+    "pages/CategoryPage"
   ]
 }

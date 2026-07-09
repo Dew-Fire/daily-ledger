@@ -1,3 +1,5 @@
+import { router } from '@kit.ArkUI';
+
 @Component
 export struct MinePage {
   build() {
@@ -11,7 +13,7 @@ export struct MinePage {
 
       // 功能列表
       Column() {
-        this.MenuItem('分类管理', '管理收支分类与图标')
+        this.MenuItem('分类管理', '管理收支分类与图标', 'pages/CategoryPage')
         Divider().margin({ left: 16 })
         this.MenuItem('月度预算', '设置每月预算上限')
         Divider().margin({ left: 16 })
@@ -31,7 +33,7 @@ export struct MinePage {
   }
 
   @Builder
-  MenuItem(title: string, desc: string) {
+  MenuItem(title: string, desc: string, route?: string) {
     Row() {
       Column() {
         Text(title)
@@ -52,5 +54,10 @@ export struct MinePage {
     }
     .width('100%')
     .padding({ left: 16, right: 16, top: 14, bottom: 14 })
+    .onClick(() => {
+      if (route) {
+        router.pushUrl({ url: route });
+      }
+    })
   }
 }
