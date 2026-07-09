@@ -1,8 +1,8 @@
 import { router } from '@kit.ArkUI';
 import { promptAction } from '@kit.ArkUI';
-import { getFlatCategoryList, type FlatCategoryItem } from '../model/CategoryModel';
 import type { BillItem } from '../model/BillModel';
 import { billViewModel } from '../viewmodel/BillViewModel';
+import { categoryViewModel, type FlatCategory } from '../viewmodel/CategoryViewModel';
 
 @Entry
 @Component
@@ -13,7 +13,7 @@ export struct AddBillPage {
   @State selectedCategoryName: string = '';
   @State note: string = '';
   @State selectedDate: string = '';
-  @State categoryList: Array<FlatCategoryItem> = [];
+  @State categoryList: Array<FlatCategory> = [];
 
   // 编辑模式
   @State isEditMode: boolean = false;
@@ -43,8 +43,8 @@ export struct AddBillPage {
     this.updateCategories();
   }
 
-  updateCategories(): void {
-    this.categoryList = getFlatCategoryList(this.billType);
+  async updateCategories(): Promise<void> {
+    this.categoryList = await categoryViewModel.getAllCategories(this.billType);
   }
 
   build() {
@@ -135,7 +135,7 @@ export struct AddBillPage {
               .margin({ bottom: 12 })
 
             Grid() {
-              ForEach(this.categoryList, (item: FlatCategoryItem) => {
+              ForEach(this.categoryList, (item: FlatCategory) => {
                 GridItem() {
                   Column() {
                     Text(item.icon)

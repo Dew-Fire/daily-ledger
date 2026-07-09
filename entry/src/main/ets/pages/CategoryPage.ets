@@ -1,22 +1,7 @@
 import { router } from '@kit.ArkUI';
 import { promptAction } from '@kit.ArkUI';
-import {
-  EXPENSE_CATEGORIES,
-  INCOME_CATEGORIES,
-  type CategoryGroup,
-  type SubCategory,
-} from '../model/CategoryModel';
-import { categoryViewModel } from '../viewmodel/CategoryViewModel';
+import { categoryViewModel, type FlatCategory } from '../viewmodel/CategoryViewModel';
 import type { CustomCategory } from '../database/CategoryDao';
-
-// 混合分类项（预设 + 自定义）
-interface MixedCategory {
-  key: string;
-  name: string;
-  icon: string;
-  isCustom: boolean;
-  dbId?: number;        // 数据库 ID（仅自定义）
-}
 
 const ICON_OPTIONS: Array<string> = [
   '🍽️', '🍱', '🍿', '🥤', '☕', '🍰', '🍜', '🥩',
@@ -30,10 +15,9 @@ const ICON_OPTIONS: Array<string> = [
 @Entry
 @Component
 export struct CategoryPage {
-  @State currentTab: number = 0;           // 0: 支出, 1: 收入
-  @State categories: Array<MixedCategory> = [];
+  @State currentTab: number = 0;
+  @State categories: Array<FlatCategory> = [];
   @State showAddDialog: boolean = false;
-  @State editCatKey: string = '';
   @State editCatName: string = '';
   @State editCatIcon: string = '📌';
   @State isEditing: boolean = false;
@@ -44,35 +28,7 @@ export struct CategoryPage {
   }
 
   async loadCategories(): Promise<void> {
-    const groups = this.currentTab === 0 ? EXPENSE_CATEGORIES : INCOME_CATEGORIES;
-    const customCats = await categoryViewModel.loadCategoriesByType(this.currentTab);
-
-    const result: Array<MixedCategory> = [];
-
-    // 添加预设分类
-    groups.forEach((group) => {
-      group.children.forEach((child) => {
-        result.push({
-          key: child.id,
-          name: `${group.name}·${child.name}`,
-          icon: child.icon,
-          isCustom: false,
-        });
-      });
-    });
-
-    // 添加自定义分类
-    customCats.forEach((cat) => {
-      result.push({
-        key: cat.categoryKey,
-        name: cat.name,
-        icon: cat.icon,
-        isCustom: true,
-        dbId: cat.id,
-      });
-    });
-
-    this.categories = result;
+    this.categories = await categoryViewModel.getAllCategories(this.currentTab);
   }
 
   onTabChange(index: number): void {
@@ -88,7 +44,7 @@ export struct CategoryPage {
     this.showAddDialog = true;
   }
 
-  openEditDialog(cat: MixedCategory): void {
+  openEditDialog(cat: FlatCategory): void {
     if (!cat.isCustom) return;
     this.isEditing = true;
     this.editingDbId = cat.dbId || 0;
@@ -122,14 +78,14 @@ export struct CategoryPage {
         await categoryViewModel.addCategory(cat);
         promptAction.showToast({ message: '添加成功', duration: 2000 });
       }
-      this.showAddDialog = false;
       await this.loadCategories();
+      this.showAddDialog = false;
     } catch (e) {
       promptAction.showToast({ message: '操作失败', duration: 2000 });
     }
   }
 
-  async deleteCategory(cat: MixedCategory): Promise<void> {
+  async deleteCategory(cat: FlatCategory): Promise<void> {
     if (!cat.isCustom || !cat.dbId) return;
     try {
       await categoryViewModel.deleteCategory(cat.dbId);
@@ -187,7 +143,7 @@ export struct CategoryPage {
 
         // 分类列表
         List() {
-          ForEach(this.categories, (cat: MixedCategory) => {
+          ForEach(this.categories, (cat: FlatCategory) => {
             ListItem() {
               Row() {
                 Text(cat.icon)
@@ -224,7 +180,7 @@ export struct CategoryPage {
               .width('100%')
               .padding({ left: 16, right: 16, top: 12, bottom: 12 })
             }
-          }, (cat: MixedCategory) => cat.key)
+          }, (cat: FlatCategory) => cat.id)
         }
         .width('100%')
         .layoutWeight(1)
@@ -241,7 +197,6 @@ export struct CategoryPage {
               .fontSize(18)
               .fontWeight(FontWeight.Bold)
               .fontColor('#333333')
-              .margin({ bottom: 16 })
 
             TextInput({ text: this.editCatName, placeholder: '分类名称' })
               .fontSize(15)
@@ -249,7 +204,7 @@ export struct CategoryPage {
               .padding(12)
               .backgroundColor('#F5F5F5')
               .borderRadius(8)
-              .margin({ bottom: 12 })
+              .margin({ top: 14, bottom: 12 })
               .onChange((value: string) => { this.editCatName = value; })
 
             // 图标选择
@@ -258,28 +213,36 @@ export struct CategoryPage {
               .fontColor('#999999')
               .margin({ bottom: 8 })
 
-            Grid() {
-              ForEach(ICON_OPTIONS, (icon: string) => {
-                GridItem() {
-                  Text(icon)
-                    .fontSize(22)
-                    .textAlign(TextAlign.Center)
-                }
-                .padding(6)
-                .borderRadius(6)
-                .backgroundColor(this.editCatIcon === icon ? '#E3F2FD' : '#F5F5F5')
-                .border({
-                  width: this.editCatIcon === icon ? 1.5 : 0,
-                  color: '#1296db'
+            Scroll() {
+              Grid() {
+                ForEach(ICON_OPTIONS, (icon: string) => {
+                  GridItem() {
+                    Column() {
+                      Text(icon)
+                        .fontSize(26)
+                    }
+                    .width('100%')
+                    .height(44)
+                    .justifyContent(FlexAlign.Center)
+                    .alignItems(HorizontalAlign.Center)
+                  }
+                  .borderRadius(8)
+                  .backgroundColor(this.editCatIcon === icon ? '#E3F2FD' : '#F5F5F5')
+                  .border({
+                    width: this.editCatIcon === icon ? 1.5 : 0,
+                    color: '#1296db'
+                  })
+                  .onClick(() => { this.editCatIcon = icon; })
                 })
-                .onClick(() => { this.editCatIcon = icon; })
-              })
+              }
+              .columnsTemplate('1fr 1fr 1fr 1fr 1fr 1fr')
+              .rowsGap(8)
+              .columnsGap(8)
+              .width('100%')
             }
-            .columnsTemplate('1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr')
-            .rowsGap(6)
-            .columnsGap(6)
-            .width('100%')
-            .margin({ bottom: 16 })
+            .constraintSize({ maxHeight: 260 })
+            .scrollBar(BarState.Auto)
+            .margin({ bottom: 14 })
 
             Row() {
               Button('取消')
@@ -298,11 +261,11 @@ export struct CategoryPage {
             .width('100%')
           }
           .width('100%')
-          .padding(24)
+          .padding(20)
           .backgroundColor('#FFFFFF')
           .borderRadius(16)
         }
-        .width('85%')
+        .width('88%')
       }
     }
     .width('100%')
