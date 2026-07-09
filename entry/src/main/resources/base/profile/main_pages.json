@@ -5,6 +5,7 @@
     "pages/AddBillPage",
     "pages/StatisticsPage",
     "pages/MinePage",
-    "pages/CategoryPage"
+    "pages/CategoryPage",
+    "pages/BudgetPage"
   ]
 }

@@ -15,7 +15,7 @@ export struct MinePage {
       Column() {
         this.MenuItem('分类管理', '管理收支分类与图标', 'pages/CategoryPage')
         Divider().margin({ left: 16 })
-        this.MenuItem('月度预算', '设置每月预算上限')
+        this.MenuItem('月度预算', '设置每月预算上限', 'pages/BudgetPage')
         Divider().margin({ left: 16 })
         this.MenuItem('数据导出', '导出账单明细')
         Divider().margin({ left: 16 })
