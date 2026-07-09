@@ -11,6 +11,10 @@
     {
       "name": "EntryAbility_label",
       "value": "记账本"
+    },
+    {
+      "name": "form_desc",
+      "value": "当月收支概况服务卡片"
     }
   ]
 }

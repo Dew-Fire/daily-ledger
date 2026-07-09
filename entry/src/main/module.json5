@@ -11,6 +11,21 @@
     "deliveryWithInstall": true,
     "installationFree": false,
     "pages": "$profile:main_pages",
+    "form": [],
+    "extensionAbilities": [
+      {
+        "name": "MyFormAbility",
+        "srcEntry": "./ets/widget/MyFormAbility.ets",
+        "type": "form",
+        "description": "$string:form_desc",
+        "metadata": [
+          {
+            "name": "ohos.extension.form",
+            "resource": "$profile:form_config"
+          }
+        ]
+      }
+    ],
     "abilities": [
       {
         "name": "EntryAbility",
