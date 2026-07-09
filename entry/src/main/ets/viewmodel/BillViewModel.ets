@@ -49,6 +49,58 @@ class BillViewModel {
   async getMonthSummary(month: string): Promise<{ income: number; expense: number }> {
     return await this.dao.getMonthSummary(month);
   }
+
+  /**
+   * 获取月度分类统计数据
+   */
+  async getCategoryStats(month: string): Promise<Array<{ categoryId: string; name: string; amount: number; type: number }>> {
+    const bills = await this.dao.queryByMonth(month);
+    const statsMap = new Map<string, { categoryId: string; name: string; amount: number; type: number }>();
+
+    bills.forEach((b) => {
+      const key = b.categoryId;
+      const existing = statsMap.get(key);
+      if (existing) {
+        existing.amount += b.amount;
+      } else {
+        statsMap.set(key, {
+          categoryId: b.categoryId,
+          name: b.categoryName,
+          amount: b.amount,
+          type: b.type,
+        });
+      }
+    });
+
+    return Array.from(statsMap.values()).sort((a, b) => b.amount - a.amount);
+  }
+
+  /**
+   * 获取近几个月收支趋势
+   */
+  async getMonthlyTrend(months: number = 6): Promise<Array<{ month: string; income: number; expense: number }>> {
+    const allBills = await this.dao.queryAll();
+    const now = new Date();
+    const result: Array<{ month: string; income: number; expense: number }> = [];
+
+    for (let i = months - 1; i >= 0; i--) {
+      const d = new Date(now.getFullYear(), now.getMonth() - i, 1);
+      const month = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`;
+      let income = 0;
+      let expense = 0;
+
+      allBills.forEach((b) => {
+        if (b.date.startsWith(month)) {
+          if (b.type === 1) income += b.amount;
+          else expense += b.amount;
+        }
+      });
+
+      result.push({ month, income, expense });
+    }
+
+    return result;
+  }
 }
 
 // 单例导出
