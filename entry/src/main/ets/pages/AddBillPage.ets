@@ -111,11 +111,21 @@ export struct AddBillPage {
               TextInput({ text: this.amount, placeholder: '0.00' })
                 .fontSize(32)
                 .fontWeight(FontWeight.Bold)
-                .type(InputType.Number)
+                .type(InputType.Normal)
+                .maxLength(12)
                 .width('100%')
                 .backgroundColor(Color.Transparent)
                 .onChange((value: string) => {
-                  this.amount = value;
+                  // 只允许数字和一个小数点
+                  const filtered = value.replace(/[^0-9.]/g, '');
+                  const parts = filtered.split('.');
+                  if (parts.length > 2) {
+                    this.amount = parts[0] + '.' + parts.slice(1).join('');
+                  } else if (parts.length === 2 && parts[1].length > 2) {
+                    this.amount = parts[0] + '.' + parts[1].substring(0, 2);
+                  } else {
+                    this.amount = filtered;
+                  }
                 })
             }
             .width('100%')
@@ -182,12 +192,30 @@ export struct AddBillPage {
             Text(this.selectedDate)
               .fontSize(15)
               .fontColor('#1296db')
+
+            Text(' 📅')
+              .fontSize(15)
           }
           .width('100%')
           .padding(16)
           .backgroundColor('#FFFFFF')
           .borderRadius(12)
           .margin({ left: 16, right: 16, top: 8 })
+          .onClick(() => {
+            const parts = this.selectedDate.split('-');
+            const year = parseInt(parts[0]);
+            const month = parseInt(parts[1]) - 1;
+            const day = parseInt(parts[2]);
+
+            DatePickerDialog.show({
+              start: new Date('2000-1-1'),
+              end: new Date('2099-12-31'),
+              selected: new Date(year, month, day),
+              onAccept: (value: DatePickerResult) => {
+                this.selectedDate = `${value.year}-${String(value.month! + 1).padStart(2, '0')}-${String(value.day!).padStart(2, '0')}`;
+              }
+            });
+          })
 
           // 备注输入
           TextInput({ text: this.note, placeholder: '添加备注...' })
