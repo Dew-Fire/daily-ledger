@@ -77,19 +77,22 @@ export class CategoryDao {
     const resultSet = await store.query(predicates);
     const categories: Array<CustomCategory> = [];
 
-    while (resultSet.goToNextRow()) {
-      categories.push({
-        id: resultSet.getLong(resultSet.getColumnIndex('id')),
-        categoryKey: resultSet.getString(resultSet.getColumnIndex('category_key')),
-        name: resultSet.getString(resultSet.getColumnIndex('name')),
-        icon: resultSet.getString(resultSet.getColumnIndex('icon')),
-        type: resultSet.getLong(resultSet.getColumnIndex('type')),
-        parentId: resultSet.getString(resultSet.getColumnIndex('parent_id')),
-        isCustom: resultSet.getLong(resultSet.getColumnIndex('is_custom')),
-        sortOrder: resultSet.getLong(resultSet.getColumnIndex('sort_order')),
-      });
+    try {
+      while (resultSet.goToNextRow()) {
+        categories.push({
+          id: resultSet.getLong(resultSet.getColumnIndex('id')),
+          categoryKey: resultSet.getString(resultSet.getColumnIndex('category_key')),
+          name: resultSet.getString(resultSet.getColumnIndex('name')),
+          icon: resultSet.getString(resultSet.getColumnIndex('icon')),
+          type: resultSet.getLong(resultSet.getColumnIndex('type')),
+          parentId: resultSet.getString(resultSet.getColumnIndex('parent_id')),
+          isCustom: resultSet.getLong(resultSet.getColumnIndex('is_custom')),
+          sortOrder: resultSet.getLong(resultSet.getColumnIndex('sort_order')),
+        });
+      }
+    } finally {
+      resultSet.close();
     }
-    resultSet.close();
     return categories;
   }
 
@@ -104,19 +107,22 @@ export class CategoryDao {
     const resultSet = await store.query(predicates);
     const categories: Array<CustomCategory> = [];
 
-    while (resultSet.goToNextRow()) {
-      categories.push({
-        id: resultSet.getLong(resultSet.getColumnIndex('id')),
-        categoryKey: resultSet.getString(resultSet.getColumnIndex('category_key')),
-        name: resultSet.getString(resultSet.getColumnIndex('name')),
-        icon: resultSet.getString(resultSet.getColumnIndex('icon')),
-        type: resultSet.getLong(resultSet.getColumnIndex('type')),
-        parentId: resultSet.getString(resultSet.getColumnIndex('parent_id')),
-        isCustom: resultSet.getLong(resultSet.getColumnIndex('is_custom')),
-        sortOrder: resultSet.getLong(resultSet.getColumnIndex('sort_order')),
-      });
+    try {
+      while (resultSet.goToNextRow()) {
+        categories.push({
+          id: resultSet.getLong(resultSet.getColumnIndex('id')),
+          categoryKey: resultSet.getString(resultSet.getColumnIndex('category_key')),
+          name: resultSet.getString(resultSet.getColumnIndex('name')),
+          icon: resultSet.getString(resultSet.getColumnIndex('icon')),
+          type: resultSet.getLong(resultSet.getColumnIndex('type')),
+          parentId: resultSet.getString(resultSet.getColumnIndex('parent_id')),
+          isCustom: resultSet.getLong(resultSet.getColumnIndex('is_custom')),
+          sortOrder: resultSet.getLong(resultSet.getColumnIndex('sort_order')),
+        });
+      }
+    } finally {
+      resultSet.close();
     }
-    resultSet.close();
     return categories;
   }
 }

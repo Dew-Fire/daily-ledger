@@ -80,11 +80,16 @@ export struct BillListPage {
         this.billGroups = groupBillsByDate(this.allBills);
         this.isEmpty = false;
 
+        // 只统计当月收支
+        const now = new Date();
+        const currentMonth = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`;
         let income = 0;
         let expense = 0;
-        this.allBills.forEach((b) => {
-          if (b.type === 1) income += b.amount;
-          else expense += b.amount;
+        this.allBills.forEach((b: BillItem) => {
+          if (b.date.startsWith(currentMonth)) {
+            if (b.type === 1) income += b.amount;
+            else expense += b.amount;
+          }
         });
         this.monthIncome = income;
         this.monthExpense = expense;

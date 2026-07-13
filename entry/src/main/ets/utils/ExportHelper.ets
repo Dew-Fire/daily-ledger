@@ -1,6 +1,13 @@
-import { fileIo } from '@ohos.file.fs';
+import { fileIo, Environment } from '@kit.CoreFileKit';
 import { billViewModel } from '../viewmodel/BillViewModel';
 import type { BillItem } from '../model/BillModel';
+
+// 导出摘要接口
+interface ExportSummary {
+  totalBills: number;
+  totalExpense: number;
+  totalIncome: number;
+}
 
 /**
  * 账单导出工具 — 生成 CSV 并写入文件
@@ -9,20 +16,16 @@ export class ExportHelper {
 
   /**
    * 导出所有账单为 CSV 文件
-   * @returns 导出文件路径
    */
   static async exportToCsv(context: Context): Promise<string> {
     const bills = await billViewModel.loadBills();
 
-    // CSV 表头
     const header = '日期,类型,分类,金额,备注';
     const rows: Array<string> = [header];
 
-    // 数据行（按日期升序）
     bills.sort((a: BillItem, b: BillItem) => a.date.localeCompare(b.date));
     bills.forEach((b: BillItem) => {
       const typeStr = b.type === 1 ? '收入' : '支出';
-      // CSV 转义：金额不加引号，备注中的逗号需要处理
       const noteEscaped = b.note.replace(/"/g, '""');
       const noteQuoted = b.note ? `"${noteEscaped}"` : '';
       rows.push(`${b.date},${typeStr},${b.categoryName},${b.amount.toFixed(2)},${noteQuoted}`);
@@ -30,13 +33,19 @@ export class ExportHelper {
 
     const csvContent = rows.join('\n');
 
-    // 写入缓存目录
-    const contextDir = context.cacheDir;
     const now = new Date();
     const fileName = `记账数据_${now.getFullYear()}${String(now.getMonth() + 1).padStart(2, '0')}${String(now.getDate()).padStart(2, '0')}.csv`;
-    const filePath = `${contextDir}/${fileName}`;
 
-    const file = fileIo.openSync(filePath, fileIo.OpenMode.CREATE | fileIo.OpenMode.WRITE_ONLY | fileIo.OpenMode.TRUNC);
+    // 写入公共下载目录，文件管理器可见
+    let downloadDir: string;
+    try {
+      downloadDir = Environment.getUserDownloadDir();
+    } catch (e) {
+      downloadDir = context.cacheDir;
+    }
+    const filePath = `${downloadDir}/${fileName}`;
+
+    const file: fileIo.File = fileIo.openSync(filePath, fileIo.OpenMode.CREATE | fileIo.OpenMode.WRITE_ONLY | fileIo.OpenMode.TRUNC);
     fileIo.writeSync(file.fd, csvContent);
     fileIo.closeSync(file);
 
@@ -46,7 +55,7 @@ export class ExportHelper {
   /**
    * 生成预览摘要
    */
-  static async getExportSummary(): Promise<{ totalBills: number; totalExpense: number; totalIncome: number }> {
+  static async getExportSummary(): Promise<ExportSummary> {
     const bills = await billViewModel.loadBills();
     let totalExpense = 0;
     let totalIncome = 0;
@@ -56,10 +65,11 @@ export class ExportHelper {
       else totalExpense += b.amount;
     });
 
-    return {
+    const summary: ExportSummary = {
       totalBills: bills.length,
       totalExpense,
       totalIncome,
     };
+    return summary;
   }
 }

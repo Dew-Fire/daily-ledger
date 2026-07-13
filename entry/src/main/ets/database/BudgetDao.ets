@@ -68,10 +68,13 @@ export class BudgetDao {
     const resultSet = await store.query(predicates);
 
     let expense = 0;
-    while (resultSet.goToNextRow()) {
-      expense += resultSet.getDouble(resultSet.getColumnIndex('amount'));
+    try {
+      while (resultSet.goToNextRow()) {
+        expense += resultSet.getDouble(resultSet.getColumnIndex('amount'));
+      }
+    } finally {
+      resultSet.close();
     }
-    resultSet.close();
 
     const percent = (expense / budget) * 100;
     const status: BudgetStatusResult = { budget, expense, percent };

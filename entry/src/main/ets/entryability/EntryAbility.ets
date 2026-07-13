@@ -7,9 +7,9 @@ import { BudgetChecker } from '../utils/BudgetChecker';
 const budgetChecker = new BudgetChecker();
 
 export default class EntryAbility extends UIAbility {
-  onCreate(want: Want, launchParam: AbilityConstant.LaunchParam): void {
+  async onCreate(want: Want, launchParam: AbilityConstant.LaunchParam): Promise<void> {
     hilog.info(0x0000, 'DailyLedger', '%{public}s', 'Ability onCreate');
-    initDatabase(this.context);
+    await initDatabase(this.context);
   }
 
   onDestroy(): void {

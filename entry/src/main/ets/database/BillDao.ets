@@ -66,18 +66,21 @@ export class BillDao {
     const resultSet = await store.query(predicates);
     const bills: Array<BillItem> = [];
 
-    while (resultSet.goToNextRow()) {
-      bills.push({
-        id: String(resultSet.getLong(resultSet.getColumnIndex('id'))),
-        amount: resultSet.getDouble(resultSet.getColumnIndex('amount')),
-        type: resultSet.getLong(resultSet.getColumnIndex('type')),
-        categoryId: resultSet.getString(resultSet.getColumnIndex('category_id')),
-        categoryName: resultSet.getString(resultSet.getColumnIndex('category_name')),
-        note: resultSet.getString(resultSet.getColumnIndex('note')),
-        date: resultSet.getString(resultSet.getColumnIndex('date')),
-      });
+    try {
+      while (resultSet.goToNextRow()) {
+        bills.push({
+          id: String(resultSet.getLong(resultSet.getColumnIndex('id'))),
+          amount: resultSet.getDouble(resultSet.getColumnIndex('amount')),
+          type: resultSet.getLong(resultSet.getColumnIndex('type')),
+          categoryId: resultSet.getString(resultSet.getColumnIndex('category_id')),
+          categoryName: resultSet.getString(resultSet.getColumnIndex('category_name')),
+          note: resultSet.getString(resultSet.getColumnIndex('note')),
+          date: resultSet.getString(resultSet.getColumnIndex('date')),
+        });
+      }
+    } finally {
+      resultSet.close();
     }
-    resultSet.close();
     return bills;
   }
 
@@ -92,18 +95,21 @@ export class BillDao {
     const resultSet = await store.query(predicates);
     const bills: Array<BillItem> = [];
 
-    while (resultSet.goToNextRow()) {
-      bills.push({
-        id: String(resultSet.getLong(resultSet.getColumnIndex('id'))),
-        amount: resultSet.getDouble(resultSet.getColumnIndex('amount')),
-        type: resultSet.getLong(resultSet.getColumnIndex('type')),
-        categoryId: resultSet.getString(resultSet.getColumnIndex('category_id')),
-        categoryName: resultSet.getString(resultSet.getColumnIndex('category_name')),
-        note: resultSet.getString(resultSet.getColumnIndex('note')),
-        date: resultSet.getString(resultSet.getColumnIndex('date')),
-      });
+    try {
+      while (resultSet.goToNextRow()) {
+        bills.push({
+          id: String(resultSet.getLong(resultSet.getColumnIndex('id'))),
+          amount: resultSet.getDouble(resultSet.getColumnIndex('amount')),
+          type: resultSet.getLong(resultSet.getColumnIndex('type')),
+          categoryId: resultSet.getString(resultSet.getColumnIndex('category_id')),
+          categoryName: resultSet.getString(resultSet.getColumnIndex('category_name')),
+          note: resultSet.getString(resultSet.getColumnIndex('note')),
+          date: resultSet.getString(resultSet.getColumnIndex('date')),
+        });
+      }
+    } finally {
+      resultSet.close();
     }
-    resultSet.close();
     return bills;
   }
 
