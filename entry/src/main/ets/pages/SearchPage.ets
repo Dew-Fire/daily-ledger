@@ -42,7 +42,7 @@ export struct SearchPage {
 
     this.allBills.forEach((b: BillItem) => {
       const matchAmount = String(b.amount).includes(keyword);
-      const matchNote = b.note.toLowerCase().includes(keyword);
+      const matchNote = (b.note || '').toLowerCase().includes(keyword);
       const matchCategory = b.categoryName.toLowerCase().includes(keyword);
       const matchDate = b.date.includes(keyword);
 

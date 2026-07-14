@@ -31,14 +31,18 @@ export struct CategoryPage {
   }
 
   async loadCategories(): Promise<void> {
-    const data = await categoryViewModel.getAllCategories(this.currentTab);
-    this.categories = data;
-    this.refreshTrigger++;
+    try {
+      const data = await categoryViewModel.getAllCategories(this.currentTab);
+      this.categories = data;
+      this.refreshTrigger++;
+    } catch (e) {
+      console.error('Failed to load categories:', JSON.stringify(e));
+    }
   }
 
-  onTabChange(index: number): void {
+  async onTabChange(index: number): Promise<void> {
     this.currentTab = index;
-    this.loadCategories();
+    await this.loadCategories();
   }
 
   openAddDialog(): void {
