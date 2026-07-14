@@ -86,6 +86,7 @@ export struct StatisticsPage {
 
       this.hasData = expenseList.length > 0 || incomeList.length > 0;
     } catch (e) {
+      console.error('Failed to load statistics:', JSON.stringify(e));
       this.hasData = false;
     } finally {
       this.isLoading = false;
